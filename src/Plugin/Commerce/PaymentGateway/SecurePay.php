@@ -267,7 +267,6 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
     }
 
     // Remember to take into account $capture when performing the request.
-    $amount = $payment->getAmount();
     $next_state = $capture ? 'completed' : 'authorization';
     $remote_id = $response['txnID'];
     $payment->setState($next_state);

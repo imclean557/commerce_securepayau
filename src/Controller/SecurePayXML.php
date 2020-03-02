@@ -54,9 +54,6 @@ class SecurePayXML extends ControllerBase {
    *   Response from Securepay.
    */
   public function sendXmlRequest() {
-    /* @var \Drupal\commerce_order\Entity\OrderInterface $order */
-    $order = $this->payment->getOrder();
-
     /* @var mixed $xml */
     $xml = $this->createXmlRequestString();
 

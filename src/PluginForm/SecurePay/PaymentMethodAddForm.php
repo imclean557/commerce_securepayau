@@ -66,7 +66,6 @@ class PaymentMethodAddForm extends BasePaymentMethodAddForm {
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\commerce_payment\Entity\PaymentMethodInterface $payment_method */
-    $payment_method = $this->entity;
     $this->validateCreditCardForm($form['payment_details'], $form_state);
   }
 
