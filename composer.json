@@ -1,0 +1,11 @@
+{
+  "name": "drupal/commerce_securepayau",
+  "type": "drupal-module",
+  "description": "Provides support for the SecurePay.com.au payment gateway with the Drupal Commerce module.",
+  "homepage": "https://www.drupal.org/project/commerce_securepayau",
+  "license": "GPL-2.0+",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/commerce_securepayau",
+    "source": "https://git.drupalcode.org/project/commerce_securepayau"
+  }
+}
