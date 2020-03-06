@@ -11,7 +11,7 @@ use Drupal\commerce_payment\Plugin\Commerce\PaymentMethodType\PaymentMethodTypeB
  *
  * @CommercePaymentMethodType(
  *   id = "secure_pay_cc",
- *   label = @Translation("SecurePay"),
+ *   label = @Translation("SecurePay Credit Card"),
  *   create_label = @Translation("Credit Card")
  * )
  */

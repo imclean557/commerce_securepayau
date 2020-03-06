@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     "amex", "dinersclub", "discover", "jcb", "maestro", "mastercard",
  *   "visa",
  *   },
+ *   requires_billing_information = FALSE,
  * )
  */
 class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
@@ -246,8 +247,6 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
    */
   public function createPayment(PaymentInterface $payment, $capture = TRUE) {
     $this->assertPaymentState($payment, ['new']);
-    $payment_method = $payment->getPaymentMethod();
-    $this->assertPaymentMethod($payment_method);
 
     // Perform the create payment request here, throw an exception if it fails.
     $securepay = new SecurePayXML($this->configuration, $payment, static::getPaymentDetails());
@@ -267,6 +266,7 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
     }
 
     // Remember to take into account $capture when performing the request.
+    $amount = $payment->getAmount();
     $next_state = $capture ? 'completed' : 'authorization';
     $remote_id = $response['txnID'];
     $payment->setState($next_state);

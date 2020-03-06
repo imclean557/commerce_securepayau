@@ -50,13 +50,15 @@ class PaymentMethodAddForm extends BasePaymentMethodAddForm {
       $store = $store_storage->loadDefault();
     }
 
-    $form['billing_information'] = [
-      '#parents' => array_merge($form['#parents'], ['billing_information']),
-      '#type' => 'commerce_profile_select',
-      '#default_value' => $billing_profile,
-      '#default_country' => $store ? $store->getAddress()->getCountryCode() : NULL,
-      '#available_countries' => $store ? $store->getBillingCountries() : [],
-    ];
+    if ($this->entity->getPaymentGateway()->get('configuration')['collect_billing_information']) {
+      $form['billing_information'] = [
+        '#parents' => array_merge($form['#parents'], ['billing_information']),
+        '#type' => 'commerce_profile_select',
+        '#default_value' => $billing_profile,
+        '#default_country' => $store ? $store->getAddress()->getCountryCode() : 'AU',
+        '#available_countries' => $store ? $store->getBillingCountries() : [],
+      ];
+    }
 
     return $form;
   }
