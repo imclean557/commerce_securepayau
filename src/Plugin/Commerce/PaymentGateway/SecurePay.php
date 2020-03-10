@@ -27,10 +27,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     "add-payment-method" =
  *   "Drupal\commerce_securepayau\PluginForm\SecurePay\PaymentMethodAddForm",
  *   },
- *   payment_method_types = {"secure_pay_cc"},
+ *   payment_method_types = {"credit_card"},
  *   credit_card_types = {
- *     "amex", "dinersclub", "discover", "jcb", "maestro", "mastercard",
- *   "visa",
+ *     "amex", "dinersclub", "discover", "jcb", "maestro", "mastercard", "visa",
  *   },
  *   requires_billing_information = FALSE,
  * )
@@ -142,17 +141,17 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
       '#title' => t('Gateway URL'),
-      '#description' => t("You shouldn't need to update these, they should just work. The are made available incase securepay decides to change their domain and you need to be able to switch this<br/><br/>Securepay have different gateway URLs for different message types. The last part of the URL indicates the type of message so you do not need to enter that here as that will be added by this module at the time of payment request.<br/><br/>Ie:<br/>For the standard payment gateway it is accessed at:<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://www.securepay.com.au/xmlapi/payment<br/><br/>The 'payment' part is added by this module so you should just enter:<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://www.securepay.com.au/xmlapi/"),
+      '#description' => t("You shouldn't need to update these, they should just work. They are made available in case Securepay decides to change their domain."),
     ];
 
     $accounts = [
       'live' => [
         'label' => t('Live transactions in a live account'),
-        'url' => 'https://www.securepay.com.au/xmlapi/',
+        'url' => 'https://www.securepay.com.au/xmlapi/payment',
       ],
       'test' => [
         'label' => t('Developer test account transactions'),
-        'url' => 'https://test.securepay.com.au/xmlapi/',
+        'url' => 'https://test.securepay.com.au/xmlapi/payment',
       ],
     ];
 
@@ -160,7 +159,7 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
       $form['settings']['gateway_urls'][$type] = [
         '#type' => 'textfield',
         '#title' => $account['label'],
-        '#default_value' => $this->configuration['gateway_urls'][$type],
+        '#default_value' => isset($this->configuration['gateway_urls'][$type]) ? $this->configuration['gateway_urls'][$type] : $accounts[$type]['url'],
       ];
     }
 
@@ -247,6 +246,8 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
    */
   public function createPayment(PaymentInterface $payment, $capture = TRUE) {
     $this->assertPaymentState($payment, ['new']);
+    $payment_method = $payment->getPaymentMethod();
+    $this->assertPaymentMethod($payment_method);
 
     // Perform the create payment request here, throw an exception if it fails.
     $securepay = new SecurePayXML($this->configuration, $payment, static::getPaymentDetails());
@@ -261,7 +262,8 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
       throw new PaymentGatewayException();
     }
 
-    if ($response->approved == "No") {
+    if ($response->Payment->TxnList->Txn->approved->__toString() == "No") {
+      $this->logger->get('commerce_securepayau')->error($this->getResponseStatus($response));
       throw new HardDeclineException('The payment was declined');
     }
 
@@ -283,6 +285,19 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
     // See \Drupal\commerce_payment\Exception for the available exceptions.
     // Delete the local entity.
     $payment_method->delete();
+  }
+
+  /**
+   * Generates a status string from SecurePay's response.
+   *
+   * @param SimplXMLElement $response
+   *   The response from SecurePay.
+   */
+  public function getResponseStatus($response) {
+    $code = $response->Payment->TxnList->Txn->responseCode->__toString();
+    $text = $response->Payment->TxnList->Txn->responseText->__toString();
+    $order = $response->Payment->TxnList->Txn->purchaseOrderNo->__toString();
+    return 'Payment declined for order ' . $order . '. Error: ' . $code . ' ' . $text;
   }
 
 }

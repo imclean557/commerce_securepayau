@@ -63,11 +63,4 @@ class PaymentMethodAddForm extends BasePaymentMethodAddForm {
     return $form;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->validateCreditCardForm($form['payment_details'], $form_state);
-  }
-
 }
