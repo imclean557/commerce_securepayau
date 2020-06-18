@@ -158,7 +158,7 @@ class SecurePayPaypal {
   public function getAccessToken() {
     $access_token = $this->oauth2Client->getAccessToken('securepay');
     if (!$access_token) {
-      // Try again/.
+      // Try again.
       $access_token = $this->oauth2Client->getAccessToken('securepay');
     }
     if ($access_token->hasExpired()) {
