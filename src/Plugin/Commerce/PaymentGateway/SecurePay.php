@@ -159,7 +159,7 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
       $form['settings']['gateway_urls'][$type] = [
         '#type' => 'textfield',
         '#title' => $account['label'],
-        '#default_value' => isset($this->configuration['gateway_urls'][$type]) ? $this->configuration['gateway_urls'][$type] : $accounts[$type]['url'],
+        '#default_value' => isset($this->configuration['gateway_urls'][$type]) ? $this->configuration['gateway_urls'][$type] : $account['url'],
       ];
     }
 
@@ -293,7 +293,7 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
    * @param SimplXMLElement $response
    *   The response from SecurePay.
    */
-  public function getResponseStatus($response) {
+  public function getResponseStatus(SimplXMLElement $response) {
     $code = $response->Payment->TxnList->Txn->responseCode->__toString();
     $text = $response->Payment->TxnList->Txn->responseText->__toString();
     $order = $response->Payment->TxnList->Txn->purchaseOrderNo->__toString();
