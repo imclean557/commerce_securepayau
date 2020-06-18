@@ -22,3 +22,13 @@ function commerce_securepayau_help($route_name, RouteMatchInterface $route_match
     default:
   }
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_securepayau_form_commerce_payment_gateway_add_form_alter(&$form, FormStateInterface $form_state) {
+  $moduleHandler = \Drupal::service('module_handler');
+  if (!$moduleHandler->moduleExists('oauth2_client')) {
+    unset($form['plugin']['#options']['securepayau_paypal_express_checkout']);
+  }
+}

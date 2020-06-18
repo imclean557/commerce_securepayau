@@ -65,14 +65,11 @@ class SecurePayPaypal {
    *   The request stack.
    * @param Drupal\Core\Config\ConfigFactoryInterface $config
    *   The config factory.
-   * @param \Drupal\oauth2_client\Service\Oauth2ClientServiceInterface $oauth2_client
-   *   The OAuth2 client.
    */
-  public function __construct(ClientInterface $http_client, RequestStack $request_stack, ConfigFactoryInterface $config, Oauth2ClientServiceInterface $oauth2_client) {
+  public function __construct(ClientInterface $http_client, RequestStack $request_stack, ConfigFactoryInterface $config) {
     $this->httpClient = $http_client;
     $this->requestStack = $request_stack;
     $this->config = $config;
-    $this->oauth2Client = $oauth2_client;
     $this->configuration = $config->get('commerce_payment.commerce_payment_gateway.securepay_paypal')->get()['configuration'];
   }
 
@@ -181,6 +178,16 @@ class SecurePayPaypal {
     else {
       return 'https://payments-stest.npe.auspost.zone/v2/wallets/paypal/payments/' . $path;
     }
+  }
+
+  /**
+   * Adds the OAuth2 client service.
+   *
+   * @param Drupal\oauth2_client\Service\Oauth2ClientServiceInterface $oauth2_client
+   *   The OAuth2 client service.
+   */
+  public function setOauth2Client(Oauth2ClientServiceInterface $oauth2_client) {
+    $this->oauth2Client = $oauth2_client;
   }
 
 }

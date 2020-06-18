@@ -1,4 +1,6 @@
 services:
   commerce_securepayau.securepay_paypal:
     class: Drupal\commerce_securepayau\SecurePayPaypal
-    arguments: ['@http_client', '@request_stack', '@config.factory', '@oauth2_client.service']
+    arguments: ['@http_client', '@request_stack', '@config.factory']
+    calls:
+      - [setOauth2Client, ['@?oauth2_client.service']]
