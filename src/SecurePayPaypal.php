@@ -99,6 +99,7 @@ class SecurePayPaypal {
       print '<pre>';
       print_r($message);
       print '</pre>';
+      return false;
       // @TODO display error properly.
     }
 
@@ -159,7 +160,7 @@ class SecurePayPaypal {
       $access_token = $this->oauth2Client->getAccessToken('securepay');
     }
     if ($access_token->hasExpired()) {
-      $this->oauth2Client->clearAccessToken('securepay');
+      $access_token->clearAccessToken('securepay');
       $access_token = $access_token->getAccessToken('securepay');
     }
     return $access_token->getToken();
