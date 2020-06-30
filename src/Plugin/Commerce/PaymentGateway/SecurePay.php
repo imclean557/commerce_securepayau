@@ -270,7 +270,7 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
     // Remember to take into account $capture when performing the request.
     $amount = $payment->getAmount();
     $next_state = $capture ? 'completed' : 'authorization';
-    $remote_id = $response['txnID'];
+    $remote_id = $response->Payment->TxnList->Txn->txnID;
     $payment->setState($next_state);
     $payment->setRemoteId($remote_id);
     static::destroyPaymentDetails();
@@ -293,7 +293,7 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
    * @param SimplXMLElement $response
    *   The response from SecurePay.
    */
-  public function getResponseStatus(SimplXMLElement $response) {
+  public function getResponseStatus(\SimpleXMLElement $response) {
     $code = $response->Payment->TxnList->Txn->responseCode->__toString();
     $text = $response->Payment->TxnList->Txn->responseText->__toString();
     $order = $response->Payment->TxnList->Txn->purchaseOrderNo->__toString();
