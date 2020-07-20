@@ -96,6 +96,7 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
       'password' => '',
       'currency' => 'AUD',
       'gateway_urls' => '',
+      'require_name_on_card' => 0,
     ] + parent::defaultConfiguration();
   }
 
@@ -105,6 +106,12 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
 
+    $form['require_name_on_card'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Require name on card'),
+      '#description' => t("Collect the name on the credit card."),
+      '#default_value' => $this->configuration['require_name_on_card'],
+    ];
     $form['credentials'] = [
       '#type' => 'fieldset',
       '#title' => t('API Merchant ID and password'),
@@ -178,6 +185,7 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
       $this->configuration['password'] = $values['credentials']['password'];
       $this->configuration['currency'] = $values['settings']['currency'];
       $this->configuration['gateway_urls'] = $values['settings']['gateway_urls'];
+      $this->configuration['require_name_on_card'] = $values['require_name_on_card'];
     }
   }
 
@@ -193,6 +201,9 @@ class SecurePay extends OnsitePaymentGatewayBase implements SecurePayInterface {
       // the PaymentMethodAddForm form elements. They are expected to be valid.
       'type', 'number', 'expiration', 'security_code',
     ];
+    if ($this->configuration['require_name_on_card']) {
+      $required_keys[] = 'name_on_card';
+    }
 
     foreach ($required_keys as $required_key) {
       if (empty($payment_details[$required_key])) {

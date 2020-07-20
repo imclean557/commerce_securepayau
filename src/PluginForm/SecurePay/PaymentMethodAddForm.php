@@ -50,7 +50,17 @@ class PaymentMethodAddForm extends BasePaymentMethodAddForm {
       $store = $store_storage->loadDefault();
     }
 
-    if ($this->entity->getPaymentGateway()->get('configuration')['collect_billing_information']) {
+    if ($payment_method->getPaymentGateway()->get('configuration')['require_name_on_card']) {
+      $form['payment_details']['name_on_card'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Name on card'),
+        '#size' => 60,
+        '#maxlength' => 128,
+        '#required' => TRUE,
+      ];
+    }
+
+    if ($payment_method->getPaymentGateway()->get('configuration')['collect_billing_information']) {
       $form['billing_information'] = [
         '#parents' => array_merge($form['#parents'], ['billing_information']),
         '#type' => 'commerce_profile_select',
@@ -62,5 +72,23 @@ class PaymentMethodAddForm extends BasePaymentMethodAddForm {
 
     return $form;
   }
+
+  /**
+   * Handles the submission of the credit card form.
+   *
+   * @param array $element
+   *   The credit card form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the complete form.
+   */
+  protected function submitCreditCardForm(array $element, FormStateInterface $form_state) {
+    if ($this->entity->getPaymentGateway()->get('configuration')['require_name_on_card']) {
+      $values = $form_state->getValue($element['#parents']);
+      $this->entity->card_name = $values['name_on_card'];     
+    }
+
+    parent::submitCreditCardForm($element, $form_state);
+  }
+
 
 }

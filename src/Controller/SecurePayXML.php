@@ -115,6 +115,14 @@ class SecurePayXML extends ControllerBase {
     $exp = $payment_details['expiration']['month'] . '/' .
                substr($payment_details['expiration']['year'], -2);
     $ccv = $payment_details['security_code'];
+    $credit_card_info = [
+      'cardNumber' => $cc,
+      'cvv' => $ccv,
+      'expiryDate' => $exp,
+    ];
+    if (isset($payment_details['name_on_card'])) {
+      $credit_card_info['cardHolderName'] = $payment_details['name_on_card'];
+    }
     $xml_payment_info = [
       'Payment' => [
         'TxnList count="1"' => [
@@ -124,11 +132,7 @@ class SecurePayXML extends ControllerBase {
             'amount' => $price,
             'currency' => $order->getTotalPrice()->getCurrencyCode(),
             'purchaseOrderNo' => $order->id(),
-            'CreditCardInfo' => [
-              'cardNumber' => $cc,
-              'cvv' => $ccv,
-              'expiryDate' => $exp,
-            ],
+            'CreditCardInfo' => $credit_card_info,
           ],
         ],
       ],
